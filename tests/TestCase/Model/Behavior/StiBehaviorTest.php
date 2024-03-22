@@ -1,54 +1,56 @@
 <?php
 
-namespace Robotusers\TableInheritance\Test\TestCase\Model\Behavior;
+namespace Spmartin\TableInheritance\Test\TestCase\Model\Behavior;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
-/**
- * @author Robert Pustułka robert.pustulka@gmail.com
- * @copyright 2017 RobotUsers
- * @license MIT
- */
 class StiBehaviorTest extends TestCase
 {
-    public $fixtures = [
-        'plugin.Robotusers\TableInheritance.Users'
+    public array $fixtures = [
+        'plugin.Spmartin\TableInheritance.Users'
     ];
 
     public function tearDown(): void
     {
         parent::tearDown();
-
-        TableRegistry::clear();
+        TableRegistry::getTableLocator()->clear();
     }
 
     public function testDiscriminator()
     {
-        $table = TableRegistry::get('Authors', [
+        $table = TableRegistry::getTableLocator()->get(
+            'Authors', [
             'table' => 'users'
-        ]);
-        $table->addBehavior('Robotusers/TableInheritance.Sti');
+            ]
+        );
+        $table->addBehavior('Spmartin/TableInheritance.Sti');
 
-        $this->assertEquals('Authors', $table->discriminator());
-        $this->assertEquals('author', $table->discriminator('author'));
+        $this->assertEquals('Authors', $table->getDiscriminator());
+        $this->assertEquals('author', $table->setDiscriminator('author'));
 
-        $table = TableRegistry::get('Editors', [
+        $table = TableRegistry::getTableLocator()->get(
+            'Editors', [
             'table' => 'users'
-        ]);
-        $table->addBehavior('Robotusers/TableInheritance.Sti', [
+            ]
+        );
+        $table->addBehavior(
+            'Spmartin/TableInheritance.Sti', [
             'discriminator' => 'editor'
-        ]);
+            ]
+        );
 
-        $this->assertEquals('editor', $table->discriminator());
+        $this->assertEquals('editor', $table->getDiscriminator());
     }
 
     public function testAcceptedDiscriminators()
     {
-        $table = TableRegistry::get('Authors', [
+        $table = TableRegistry::getTableLocator()->get(
+            'Authors', [
             'table' => 'users'
-        ]);
-        $table->addBehavior('Robotusers/TableInheritance.Sti');
+            ]
+        );
+        $table->addBehavior('Spmartin/TableInheritance.Sti');
 
         $accepted = $table->acceptedDiscriminators();
         $this->assertContains('Authors', $accepted);
@@ -64,23 +66,29 @@ class StiBehaviorTest extends TestCase
 
     public function testSave()
     {
-        $table = TableRegistry::get('Authors', [
+        $table = TableRegistry::getTableLocator()->get(
+            'Authors', [
             'table' => 'users'
-        ]);
-        $table->addBehavior('Robotusers/TableInheritance.Sti');
+            ]
+        );
+        $table->addBehavior('Spmartin/TableInheritance.Sti');
 
-        $entity = $table->newEntity([
+        $entity = $table->newEntity(
+            [
             'name' => 'Robert'
-        ]);
+            ]
+        );
         $table->save($entity);
 
         $this->assertEmpty($entity->getErrors());
         $this->assertEquals('Authors', $entity->discriminator);
 
-        $entity2 = $table->newEntity([
+        $entity2 = $table->newEntity(
+            [
             'name' => 'Robert',
             'discriminator' => 'Editors'
-        ]);
+            ]
+        );
         $table->save($entity2);
 
         $this->assertArrayHasKey('discriminator', $entity2->getErrors());
@@ -89,17 +97,23 @@ class StiBehaviorTest extends TestCase
 
     public function testSaveNoRules()
     {
-        $table = TableRegistry::get('Authors', [
+        $table = TableRegistry::getTableLocator()->get(
+            'Authors', [
             'table' => 'users'
-        ]);
-        $table->addBehavior('Robotusers/TableInheritance.Sti', [
+            ]
+        );
+        $table->addBehavior(
+            'Spmartin/TableInheritance.Sti', [
             'checkRules' => false
-        ]);
+            ]
+        );
 
-        $entity = $table->newEntity([
+        $entity = $table->newEntity(
+            [
             'name' => 'Robert',
             'discriminator' => 'Editors'
-        ]);
+            ]
+        );
         $table->save($entity);
 
         $this->assertEmpty($entity->getErrors());
@@ -108,17 +122,23 @@ class StiBehaviorTest extends TestCase
 
     public function testSaveWildcard()
     {
-        $table = TableRegistry::get('Authors', [
+        $table = TableRegistry::getTableLocator()->get(
+            'Authors', [
             'table' => 'users'
-        ]);
-        $table->addBehavior('Robotusers/TableInheritance.Sti', [
+            ]
+        );
+        $table->addBehavior(
+            'Spmartin/TableInheritance.Sti', [
             'acceptedDiscriminators' => 'author_*'
-        ]);
+            ]
+        );
 
-        $entity = $table->newEntity([
+        $entity = $table->newEntity(
+            [
             'name' => 'Robert',
             'discriminator' => 'author_foo'
-        ]);
+            ]
+        );
         $table->save($entity);
 
         $this->assertEmpty($entity->getErrors());
@@ -127,26 +147,32 @@ class StiBehaviorTest extends TestCase
 
     public function testFind()
     {
-        $authors = TableRegistry::get('Authors', [
+        $authors = TableRegistry::getTableLocator()->get(
+            'Authors', [
             'table' => 'users'
-        ]);
-        $authors->addBehavior('Robotusers/TableInheritance.Sti');
+            ]
+        );
+        $authors->addBehavior('Spmartin/TableInheritance.Sti');
 
         $authorResults = $authors->find();
         $this->assertCount(1, $authorResults);
 
-        $editors = TableRegistry::get('Editors', [
+        $editors = TableRegistry::getTableLocator()->get(
+            'Editors', [
             'table' => 'users'
-        ]);
-        $editors->addBehavior('Robotusers/TableInheritance.Sti');
+            ]
+        );
+        $editors->addBehavior('Spmartin/TableInheritance.Sti');
 
         $editorResults = $editors->find();
         $this->assertCount(1, $editorResults);
 
-        $subscribers = TableRegistry::get('Subscribers', [
+        $subscribers = TableRegistry::getTableLocator()->get(
+            'Subscribers', [
             'table' => 'users'
-        ]);
-        $subscribers->addBehavior('Robotusers/TableInheritance.Sti');
+            ]
+        );
+        $subscribers->addBehavior('Spmartin/TableInheritance.Sti');
 
         $subscriberResults = $subscribers->find();
         $this->assertCount(0, $subscriberResults);
@@ -154,12 +180,16 @@ class StiBehaviorTest extends TestCase
 
     public function testFindWildcard()
     {
-        $authors = TableRegistry::get('Authors', [
+        $authors = TableRegistry::getTableLocator()->get(
+            'Authors', [
             'table' => 'users'
-        ]);
-        $authors->addBehavior('Robotusers/TableInheritance.Sti', [
+            ]
+        );
+        $authors->addBehavior(
+            'Spmartin/TableInheritance.Sti', [
             'acceptedDiscriminators' => 'Auth*'
-        ]);
+            ]
+        );
 
         $authorResults = $authors->find();
         $this->assertCount(1, $authorResults);
@@ -172,34 +202,40 @@ class StiBehaviorTest extends TestCase
 
     public function testDelete()
     {
-        $table = TableRegistry::get('Authors', [
+        $table = TableRegistry::getTableLocator()->get(
+            'Authors', [
             'table' => 'users'
-        ]);
-        $table->addBehavior('Robotusers/TableInheritance.Sti');
+            ]
+        );
+        $table->addBehavior('Spmartin/TableInheritance.Sti');
 
         $entity = $table->get(1);
         $deleted = $table->delete($entity);
         $this->assertTrue($deleted);
 
-        $entity = TableRegistry::get('Users')->get(2);
+        $entity = TableRegistry::getTableLocator()->get('Users')->get(2);
         $deleted = $table->delete($entity);
         $this->assertFalse($deleted);
     }
 
     public function testDeleteWildcard()
     {
-        $table = TableRegistry::get('Authors', [
+        $table = TableRegistry::getTableLocator()->get(
+            'Authors', [
             'table' => 'users'
-        ]);
-        $table->addBehavior('Robotusers/TableInheritance.Sti', [
+            ]
+        );
+        $table->addBehavior(
+            'Spmartin/TableInheritance.Sti', [
             'acceptedDiscriminators' => 'Auth*'
-        ]);
+            ]
+        );
 
         $entity = $table->get(1);
         $deleted = $table->delete($entity);
         $this->assertTrue($deleted);
 
-        $entity = TableRegistry::get('Users')->get(2);
+        $entity = TableRegistry::getTableLocator()->get('Users')->get(2);
         $deleted = $table->delete($entity);
         $this->assertFalse($deleted);
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Robotusers\TableInheritance;
+namespace Spmartin\TableInheritance;
 
 use Cake\Core\BasePlugin;
 

@@ -1,18 +1,15 @@
 <?php
 
-namespace Robotusers\TableInheritance\Model\Behavior;
+namespace Spmartin\TableInheritance\Model\Behavior;
 
 use Cake\Datasource\EntityInterface;
 use Cake\Event\Event;
 use Cake\ORM\Behavior;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
+use Cake\ORM\Table;
+use Cake\ORM\TableRegistry;
 
-/**
- * @author Robert Pustułka robert.pustulka@gmail.com
- * @copyright 2016 RobotUsers
- * @license MIT
- */
 class StiBehavior extends Behavior
 {
 
@@ -23,7 +20,7 @@ class StiBehavior extends Behavior
      *
      * @var array
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'discriminatorField' => 'discriminator',
         'discriminator' => null,
         'table' => null,
@@ -36,19 +33,19 @@ class StiBehavior extends Behavior
      *
      * @var string
      */
-    protected $_discriminator;
+    protected string $_discriminator;
 
     /**
      * Accepted discriminators.
      *
      * @var array
      */
-    protected $_acceptedDiscriminators = [];
+    protected array $_acceptedDiscriminators = [];
 
     /**
      * Initialize method.
      *
-     * @param array $config Config.
+     * @param  array $config Config.
      * @return void
      */
     public function initialize(array $config): void
@@ -62,28 +59,12 @@ class StiBehavior extends Behavior
     }
 
     /**
-     * Accessor/mutator for discriminator value. It's the value used to determine which row belongs to which table.
-     *
-     * @param string|null $discriminator Discriminator value.
-     * @return string
-     * @deprecated 0.3.0 Use getDiscriminator() and setDiscriminator() instead.
-     */
-    public function discriminator($discriminator = null)
-    {
-        if ($discriminator !== null) {
-            $this->setDiscriminator($discriminator);
-        }
-
-        return $this->getDiscriminator();
-    }
-
-    /**
      * Returns default discriminator value.
      * If no discriminator has been set table alias is returned.
      *
      * @return string
      */
-    public function getDiscriminator()
+    public function getDiscriminator(): string
     {
         if ($this->_discriminator === null) {
             $this->_discriminator = $this->_table->getAlias();
@@ -95,10 +76,10 @@ class StiBehavior extends Behavior
     /**
      * Sets discriminator value.
      *
-     * @param string $discriminator Discriminator value.
+     * @param  string $discriminator Discriminator value.
      * @return \Cake\ORM\Table
      */
-    public function setDiscriminator($discriminator)
+    public function setDiscriminator(string $discriminator): Table
     {
         $this->_discriminator = $discriminator;
 
@@ -110,7 +91,7 @@ class StiBehavior extends Behavior
      *
      * @return array
      */
-    public function acceptedDiscriminators()
+    public function acceptedDiscriminators(): array
     {
         if (!$this->_acceptedDiscriminators) {
             $accepted = $this->_config['acceptedDiscriminators'];
@@ -127,21 +108,21 @@ class StiBehavior extends Behavior
     /**
      * Checks whether a discriminator is accepted.
      *
-     * @param string $discriminator Discriminator value.
+     * @param  string $discriminator Discriminator value.
      * @return bool
      */
-    public function isAcceptedDiscriminator($discriminator)
+    public function isAcceptedDiscriminator(string $discriminator): bool
     {
-        return $this->_matches($discriminator, $this->acceptedDiscriminators());
+        return $this->matches($discriminator, $this->acceptedDiscriminators());
     }
 
     /**
      * Adds an accepted discriminator.
      *
-     * @param string $discriminator Discriminator value.
+     * @param  string $discriminator Discriminator value.
      * @return \Cake\ORM\Table
      */
-    public function addAcceptedDiscriminator($discriminator)
+    public function addAcceptedDiscriminator(string $discriminator): TableRegistry
     {
         $this->_acceptedDiscriminators[] = $discriminator;
 
@@ -151,28 +132,30 @@ class StiBehavior extends Behavior
     /**
      * buildRules callback.
      *
-     * @param \Cake\Event\Event $event Event.
-     * @param \Cake\ORM\RulesChecker $rules Rules.
+     * @param  \Cake\Event\Event      $event Event.
+     * @param  \Cake\ORM\RulesChecker $rules Rules.
      * @return void
      */
-    public function buildRules(Event $event, RulesChecker $rules)
+    public function buildRules(Event $event, RulesChecker $rules): void
     {
         if ($this->_config['checkRules']) {
             $rule = [$this, 'checkRules'];
-            $rules->add($rule, 'discriminator', [
+            $rules->add(
+                $rule, 'discriminator', [
                 'errorField' => $this->_config['discriminatorField']
-            ]);
+                ]
+            );
         }
     }
 
     /**
      * beforeSave callback.
      *
-     * @param \Cake\Event\Event $event Event.
-     * @param \Cake\Datasource\EntityInterface $entity Entity.
+     * @param  \Cake\Event\Event                $event  Event.
+     * @param  \Cake\Datasource\EntityInterface $entity Entity.
      * @return void
      */
-    public function beforeSave(Event $event, EntityInterface $entity)
+    public function beforeSave(Event $event, EntityInterface $entity): void
     {
         $field = $this->_config['discriminatorField'];
         if ($entity->isNew() && !$entity->has($field)) {
@@ -184,25 +167,27 @@ class StiBehavior extends Behavior
     /**
      * beforeFind callback.
      *
-     * @param \Cake\Event\Event $event Event
-     * @param \Cake\ORM\Query $query Query
+     * @param  \Cake\Event\Event $event Event
+     * @param  \Cake\ORM\Query   $query Query
      * @return void
      */
-    public function beforeFind(Event $event, Query $query)
+    public function beforeFind(Event $event, Query $query): void
     {
-        $query->where(function ($exp) {
-            return $exp->or($this->_conditions());
-        });
+        $query->where(
+            function ($exp) {
+                return $exp->or($this->conditions());
+            }
+        );
     }
 
     /**
      * beforeDelete callback.
      *
-     * @param \Cake\Event\Event $event Event.
-     * @param \Cake\Datasource\EntityInterface $entity Entity.
+     * @param  \Cake\Event\Event                $event  Event.
+     * @param  \Cake\Datasource\EntityInterface $entity Entity.
      * @return bool
      */
-    public function beforeDelete(Event $event, EntityInterface $entity)
+    public function beforeDelete(Event $event, EntityInterface $entity): bool
     {
         $discriminatorField = $this->_config['discriminatorField'];
 
@@ -216,15 +201,15 @@ class StiBehavior extends Behavior
     /**
      * checkRules rule.
      *
-     * @param \Cake\Datasource\EntityInterface $entity Entity.
+     * @param  \Cake\Datasource\EntityInterface $entity Entity.
      * @return bool
      */
-    public function checkRules(EntityInterface $entity)
+    public function checkRules(EntityInterface $entity): bool
     {
         $field = $this->_config['discriminatorField'];
 
         if ($entity->isDirty($field)) {
-            return $this->_matches($entity->get($field), $this->acceptedDiscriminators());
+            return $this->matches($entity->get($field), $this->acceptedDiscriminators());
         }
 
         return true;
@@ -234,7 +219,7 @@ class StiBehavior extends Behavior
      *
      * @return array
      */
-    protected function _conditions()
+    protected function conditions(): array
     {
         $field = $this->_table->aliasField($this->_config['discriminatorField']) . ' LIKE';
 

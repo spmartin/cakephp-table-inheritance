@@ -1,31 +1,36 @@
 {
-    "name": "robotusers/cakephp-table-inheritance",
-    "description": "Robotusers CakePHP STI & CTI pattern plugin",
-    "homepage": "https://github.com/robotusers/cakephp-table-inheritance",
+    "name": "spmartin/cakephp-table-inheritance",
+    "description": "CakePHP STI & CTI pattern plugin",
+    "homepage": "https://github.com/spmartin/cakephp-table-inheritance",
     "type": "cakephp-plugin",
     "license": "MIT",
     "require": {
-        "php": ">=7.2.0",
-        "cakephp/orm": "^4.0"
+        "php": ">=8.0",
+        "cakephp/orm": "^5.0"
     },
     "require-dev": {
-        "php": ">=7.2.0",
-        "phpunit/phpunit": "^8.0",
-        "cakephp/cakephp": "^4.0",
+        "php": ">=8.0",
+        "phpunit/phpunit": "^11.0.7",
+        "cakephp/cakephp": "^5.0",
         "cakephp/cakephp-codesniffer": "@stable"
     },
     "autoload": {
         "psr-4": {
-            "Robotusers\\TableInheritance\\": "src"
+            "Spmartin\\TableInheritance\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Cake\\Test\\": "vendor/cakephp/cakephp/tests",
-            "Robotusers\\TableInheritance\\Test\\": "tests"
+            "Spmartin\\TableInheritance\\Test\\": "tests"
         }
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

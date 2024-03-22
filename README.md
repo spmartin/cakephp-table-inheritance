@@ -1,27 +1,27 @@
 # CakePHP Table Inheritance plugin
 
-[![Latest Stable Version](https://poser.pugx.org/robotusers/cakephp-table-inheritance/v/stable)](https://packagist.org/packages/robotusers/cakephp-table-inheritance)
-[![Total Downloads](https://poser.pugx.org/robotusers/cakephp-table-inheritance/downloads)](https://packagist.org/packages/robotusers/cakephp-table-inheritance)
+[![Latest Stable Version](https://poser.pugx.org/spmartin/cakephp-table-inheritance/v/stable)](https://packagist.org/packages/spmartin/cakephp-table-inheritance)
+[![Total Downloads](https://poser.pugx.org/spmartin/cakephp-table-inheritance/downloads)](https://packagist.org/packages/spmartin/cakephp-table-inheritance)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
-[![Build Status](https://travis-ci.org/robotusers/cakephp-table-inheritance.svg?branch=master)](https://travis-ci.org/robotusers/cakephp-table-inheritance)
-[![codecov](https://codecov.io/gh/robotusers/cakephp-table-inheritance/branch/master/graph/badge.svg)](https://codecov.io/gh/robotusers/cakephp-table-inheritance/branch/master)
+[![Build Status](https://travis-ci.org/spmartin/cakephp-table-inheritance.svg?branch=master)](https://travis-ci.org/spmartin/cakephp-table-inheritance)
+[![codecov](https://codecov.io/gh/spmartin/cakephp-table-inheritance/branch/master/graph/badge.svg)](https://codecov.io/gh/spmartin/cakephp-table-inheritance/branch/master)
 
 
 This plugin implements [Single Table Inheritance](https://en.wikipedia.org/wiki/Single_Table_Inheritance) (and hopefully will implement Class Table Inheritance in the future) patterns for CakePHP ORM.
 
 ## Installation
 
-CakePHP 4.x
+CakePHP 5.x
 
 Using composer:
 ```
-composer require robotusers/cakephp-table-inheritance
+composer require spmartin/cakephp-table-inheritance
 ```
 
-For CakePHP 3.x use version 0.4 of the plugin
+For CakePHP 4.x use version 0.5 of the plugin
 
 ```
-composer require robotusers/cakephp-table-inheritance:^0.4
+composer require robotusers/cakephp-table-inheritance:^0.5
 ```
 
 ## StiBehavior
@@ -167,3 +167,7 @@ $table = $this->Users->stiTable($data);
 $admin = $table->newEntity($data);
 $table->save($admin);
 ```
+
+
+### Original code written by Robert Pustułka <robert.pustulka@gmail.com>
+### https://github.com/robotusers/cakephp-table-inheritance/
