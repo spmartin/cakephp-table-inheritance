@@ -1,20 +1,14 @@
 <?php
 
-namespace Robotusers\TableInheritance\Model\Entity;
+namespace Spmartin\TableInheritance\Model\Entity;
 
-/**
- * @author Robert Pustułka robert.pustulka@gmail.com
- * @copyright 2016 RobotUsers
- * @license MIT
- */
 trait CopyableEntityTrait
 {
 
     /**
-     *
      * @return array
      */
-    public function copyProperties()
+    public function copyProperties(): array
     {
         return $this->_fields;
     }

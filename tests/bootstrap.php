@@ -22,9 +22,9 @@ unset($findRoot);
 
 chdir($root);
 if (file_exists($root . '/config/bootstrap.php')) {
-    require $root . '/config/bootstrap.php';
+    include $root . '/config/bootstrap.php';
 }
 
 require $root . '/vendor/cakephp/cakephp/tests/bootstrap.php';
 
-\Cake\Core\Plugin::getCollection()->add(new \Robotusers\TableInheritance\Plugin());
+\Cake\Core\Plugin::getCollection()->add(new \Spmartin\TableInheritance\Plugin());

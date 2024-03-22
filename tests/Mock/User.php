@@ -1,10 +1,10 @@
 <?php
 
-namespace Robotusers\TableInheritance\Test\Mock;
+namespace Spmartin\TableInheritance\Test\Mock;
 
 use Cake\ORM\Entity;
-use Robotusers\TableInheritance\Model\Entity\CopyableEntityInterface;
-use Robotusers\TableInheritance\Model\Entity\CopyableEntityTrait;
+use Spmartin\TableInheritance\Model\Entity\CopyableEntityInterface;
+use Spmartin\TableInheritance\Model\Entity\CopyableEntityTrait;
 
 class User extends Entity implements CopyableEntityInterface
 {

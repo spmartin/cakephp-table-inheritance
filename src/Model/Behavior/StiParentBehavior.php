@@ -1,6 +1,6 @@
 <?php
 
-namespace Robotusers\TableInheritance\Model\Behavior;
+namespace Spmartin\TableInheritance\Model\Behavior;
 
 use ArrayAccess;
 use Cake\Datasource\EntityInterface;
@@ -9,13 +9,8 @@ use Cake\ORM\Behavior;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
-use Robotusers\TableInheritance\Model\Entity\CopyableEntityInterface;
+use Spmartin\TableInheritance\Model\Entity\CopyableEntityInterface;
 
-/**
- * @author Robert Pustułka robert.pustulka@gmail.com
- * @copyright 2016 RobotUsers
- * @license MIT
- */
 class StiParentBehavior extends Behavior
 {
 
@@ -23,11 +18,11 @@ class StiParentBehavior extends Behavior
     use MatchesTrait;
 
     /**
-     * Defualt options.
+     * Default options.
      *
      * @var array
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'tableMap' => [],
         'discriminatorMap' => [],
         'discriminatorField' => 'discriminator'
@@ -38,15 +33,15 @@ class StiParentBehavior extends Behavior
      *
      * @var array
      */
-    protected $_childTables = [];
+    protected array $childTables = [];
 
     /**
      * Gets a STI table.
      *
-     * @param string|ArrayAccess|array $subject Discriminator value or an entity.
+     * @param  string|ArrayAccess|array $subject Discriminator value or an entity.
      * @return \Cake\ORM\Table
      */
-    public function stiTable($subject)
+    public function stiTable(string|ArrayAccess|array $subject): Table
     {
         if (is_array($subject) || $subject instanceof ArrayAccess) {
             $property = $this->_config['discriminatorField'];
@@ -59,11 +54,11 @@ class StiParentBehavior extends Behavior
             $discriminator = $subject;
         }
 
-        if (!array_key_exists($discriminator, $this->_childTables)) {
-            $table = $this->_findInTableMap($discriminator);
+        if (!array_key_exists($discriminator, $this->childTables)) {
+            $table = $this->findInTableMap($discriminator);
 
             if (!$table) {
-                $table = $this->_findInDiscriminatorMap($discriminator);
+                $table = $this->findInDiscriminatorMap($discriminator);
             }
             if (!$table) {
                 $table = $this->_table;
@@ -72,17 +67,17 @@ class StiParentBehavior extends Behavior
             $this->addStiTable($discriminator, $table);
         }
 
-        return $this->_childTables[$discriminator];
+        return $this->childTables[$discriminator];
     }
 
     /**
      * Adds a table to STI cache.
      *
-     * @param string $discriminator Discriminator.
-     * @param \Cake\ORM\Table|string|array $table Table instance or alias or config.
+     * @param  string                       $discriminator Discriminator.
+     * @param  \Cake\ORM\Table|string|array $table         Table instance or alias or config.
      * @return \Cake\ORM\Table
      */
-    public function addStiTable($discriminator, $table)
+    public function addStiTable(string $discriminator, Table|string|array $table): Table
     {
         if (!$table instanceof Table) {
             if (is_array($table)) {
@@ -96,7 +91,7 @@ class StiParentBehavior extends Behavior
             $table = $this->getTableLocator()->get($alias, $options);
         }
 
-        $this->_childTables[$discriminator] = $table;
+        $this->childTables[$discriminator] = $table;
 
         return $this->_table;
     }
@@ -104,11 +99,11 @@ class StiParentBehavior extends Behavior
     /**
      * Creates new entity using STI table.
      *
-     * @param array|null $data Data.
-     * @param array $options Options.
+     * @param  array|null $data    Data.
+     * @param  array      $options Options.
      * @return \Cake\Datasource\EntityInterface
      */
-    public function newStiEntity($data = null, array $options = [])
+    public function newStiEntity(?array $data = null, array $options = []): EntityInterface
     {
         $table = $this->stiTable($data);
 
@@ -118,46 +113,52 @@ class StiParentBehavior extends Behavior
     /**
      * BeforeFind callback - converts entities based on STI tables.
      *
-     * @param \Cake\Event\Event $event Event.
-     * @param \Cake\ORM\Query $query Query.
-     * @param \ArrayAccess $options Options.
+     * @param  \Cake\Event\Event $event   Event.
+     * @param  \Cake\ORM\Query   $query   Query.
+     * @param  \ArrayAccess      $options Options.
      * @return void
      */
-    public function beforeFind(EventInterface $event, Query $query, ArrayAccess $options)
+    public function beforeFind(EventInterface $event, Query $query, ArrayAccess $options): void
     {
         if (!$query->isHydrationEnabled()) {
             return;
         }
-        $query->formatResults(function ($results) {
-            return $results->map(function (EntityInterface $row) {
-                if ($row instanceof CopyableEntityInterface) {
-                    $table = $this->stiTable($row);
-                    $entityClass = $table->getEntityClass();
+        $query->formatResults(
+            function ($results) {
+                return $results->map(
+                    function (EntityInterface $row) {
+                        if ($row instanceof CopyableEntityInterface) {
+                            $table = $this->stiTable($row);
+                            $entityClass = $table->getEntityClass();
 
-                    $row = new $entityClass($row->copyProperties(), [
-                        'markNew' => $row->isNew(),
-                        'markClean' => true,
-                        'guard' => false,
-                        'source' => $table->getRegistryAlias()
-                    ]);
-                }
+                            $row = new $entityClass(
+                                $row->copyProperties(), [
+                                'markNew' => $row->isNew(),
+                                'markClean' => true,
+                                'guard' => false,
+                                'source' => $table->getRegistryAlias()
+                                ]
+                            );
+                        }
 
-                return $row;
-            });
-        });
+                        return $row;
+                    }
+                );
+            }
+        );
     }
 
     /**
      * Searches for a match in tableMap.
      *
-     * @param string $discriminator Discriminator.
+     * @param  string $discriminator Discriminator.
      * @return string
      */
-    protected function _findInTableMap($discriminator)
+    protected function findInTableMap(string $discriminator): string
     {
         $map = $this->_config['tableMap'];
         foreach ($map as $table => $rules) {
-            if ($this->_matches($discriminator, (array)$rules)) {
+            if ($this->matches($discriminator, (array)$rules)) {
                 return $table;
             }
         }
@@ -166,14 +167,14 @@ class StiParentBehavior extends Behavior
     /**
      * Searches for a match in tableMap.
      *
-     * @param string $discriminator Discriminator.
+     * @param  string $discriminator Discriminator.
      * @return mixed
      */
-    protected function _findInDiscriminatorMap($discriminator)
+    protected function findInDiscriminatorMap(string $discriminator): mixed
     {
         $map = $this->_config['discriminatorMap'];
         foreach ($map as $rule => $table) {
-            if ($this->_matches($discriminator, (array)$rule)) {
+            if ($this->matches($discriminator, (array)$rule)) {
                 return $table;
             }
         }

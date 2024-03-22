@@ -1,6 +1,6 @@
 <?php
 
-namespace Robotusers\TableInheritance\Test\Mock;
+namespace Spmartin\TableInheritance\Test\Mock;
 
 class Author extends User
 {

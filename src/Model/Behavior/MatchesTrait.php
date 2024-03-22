@@ -1,23 +1,17 @@
 <?php
 
-namespace Robotusers\TableInheritance\Model\Behavior;
+namespace Spmartin\TableInheritance\Model\Behavior;
 
-/**
- * @author Robert Pustułka robert.pustulka@gmail.com
- * @copyright 2016 RobotUsers
- * @license MIT
- */
 trait MatchesTrait
 {
-
     /**
      * Checks rules match.
      *
-     * @param string $subject Subject
-     * @param array $rules Rules list
+     * @param  string $subject Subject
+     * @param  array  $rules   Rules list
      * @return bool
      */
-    protected function _matches($subject, array $rules)
+    protected function matches(string $subject, array $rules): bool
     {
         foreach ($rules as $rule) {
             $pattern = '/^' . str_replace('\*', '.*', preg_quote($rule, '/')) . '$/';

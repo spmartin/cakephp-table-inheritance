@@ -1,30 +1,26 @@
 <?php
 
-namespace Robotusers\TableInheritance\Test\TestCase\Model\Behavior;
+namespace Spmartin\TableInheritance\Test\TestCase\Model\Behavior;
 
+use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
-use Robotusers\TableInheritance\Test\Mock\Author;
-use Robotusers\TableInheritance\Test\Mock\Editor;
-use Robotusers\TableInheritance\Test\Mock\Reader;
-use Robotusers\TableInheritance\Test\Mock\User;
+use Spmartin\TableInheritance\Test\Mock\Author;
+use Spmartin\TableInheritance\Test\Mock\Editor;
+use Spmartin\TableInheritance\Test\Mock\Reader;
+use Spmartin\TableInheritance\Test\Mock\User;
 
-/**
- * @author Robert Pustułka robert.pustulka@gmail.com
- * @copyright 2015 RobotUsers
- * @license MIT
- */
 class StiParentBehaviorTest extends TestCase
 {
-    public $fixtures = [
-        'plugin.Robotusers\TableInheritance.Users'
+    public array $fixtures = [
+        'plugin.Spmartin\TableInheritance.Users'
     ];
 
     /**
      *
-     * @var \Cake\ORM\Table
+     * @var Table
      */
-    public $table;
+    public Table $table;
 
     public function setUp(): void
     {
@@ -42,20 +38,27 @@ class StiParentBehaviorTest extends TestCase
         $this->table = TableRegistry::getTableLocator()->get('Users');
         $this->table->setEntityClass(User::class);
 
-        $authors = TableRegistry::getTableLocator()->get('Authors', [
+        $authors = TableRegistry::getTableLocator()->get(
+            'Authors', [
             'table' => 'users'
-        ]);
-        $editors = TableRegistry::getTableLocator()->get('Editors', [
+            ]
+        );
+        $editors = TableRegistry::getTableLocator()->get(
+            'Editors', [
             'table' => 'users'
-        ]);
-        $readers = TableRegistry::getTableLocator()->get('Readers', [
+            ]
+        );
+        $readers = TableRegistry::getTableLocator()->get(
+            'Readers', [
             'table' => 'users'
-        ]);
+            ]
+        );
 
-        $authors->addBehavior('Robotusers/TableInheritance.Sti');
-        $editors->addBehavior('Robotusers/TableInheritance.Sti');
-        $readers->addBehavior('Robotusers/TableInheritance.Sti');
-        $this->table->addBehavior('Robotusers/TableInheritance.StiParent', [
+        $authors->addBehavior('Spmartin/TableInheritance.Sti');
+        $editors->addBehavior('Spmartin/TableInheritance.Sti');
+        $readers->addBehavior('Spmartin/TableInheritance.Sti');
+        $this->table->addBehavior(
+            'Spmartin/TableInheritance.StiParent', [
             'discriminatorMap' => [
                 'Authors' => 'Authors',
                 'Editors' => 'Editors'
@@ -66,7 +69,8 @@ class StiParentBehaviorTest extends TestCase
                     'Subscribers'
                 ]
             ]
-        ]);
+            ]
+        );
 
         $authors->setEntityClass(Author::class);
         $editors->setEntityClass(Editor::class);
@@ -75,12 +79,16 @@ class StiParentBehaviorTest extends TestCase
 
     public function testStiTable()
     {
-        $this->table->behaviors()->get('StiParent')->setConfig('tableMap', [
+        $this->table->behaviors()->get('StiParent')->setConfig(
+            'tableMap', [
             'Readers' => 'reader_*'
-        ], false);
-        $this->table->behaviors()->get('StiParent')->setConfig('discriminatorMap', [
+            ], false
+        );
+        $this->table->behaviors()->get('StiParent')->setConfig(
+            'discriminatorMap', [
             '*author' => TableRegistry::getTableLocator()->get('Authors')
-        ], false);
+            ], false
+        );
 
         $map = [
             'reader_1' => 'Readers',
@@ -92,9 +100,11 @@ class StiParentBehaviorTest extends TestCase
         ];
 
         foreach ($map as $discriminator => $alias) {
-            $entity = $this->table->newEntity([
+            $entity = $this->table->newEntity(
+                [
                 'discriminator' => $discriminator
-            ]);
+                ]
+            );
             $table = $this->table->stiTable($entity);
             $this->assertEquals($alias, $table->getAlias());
         }
@@ -103,13 +113,11 @@ class StiParentBehaviorTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
-
-        TableRegistry::clear();
+        TableRegistry::getTableLocator()->clear();
     }
 
     public function testNewStiEntity()
     {
-        $entities = [];
         foreach ($this->entityMap as $discriminator => $class) {
             $data = [
                 'discriminator' => $discriminator
@@ -117,8 +125,6 @@ class StiParentBehaviorTest extends TestCase
 
             $entity = $this->table->newStiEntity($data);
             $this->assertInstanceOf($class, $entity);
-
-            $entities[] = $entity;
         }
     }
 
